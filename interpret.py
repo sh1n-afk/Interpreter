@@ -73,17 +73,20 @@ def interpretDTREE(d) :
             var = d[1]
             val = interpretETREE(d[2])
             declare(active, var, val)
-      if d[0] == 'proc' :
+      elif d[0] == 'proc' :
             procname = d[1]
             param = d[2]
             cmd = d[4]
             handle = allocateNS()
             declare(active, procname, handle)
+            heap[handle] = dict()
             heap[handle]['type'] = 'proc'
             heap[handle]['params'] = 'param'
             heap[handle]['local'] = []
             heap[handle]['body'] = 'cmd'
             heap[handle]['parentns'] = 'active'
+      else :
+            crash(d,"invalid declaration")
 
     
 
@@ -122,11 +125,10 @@ def interpretCTREE(c) :
             if isinstance(closureHandle, int) :
                   crash("Cannot call an integer")
             if isinstance(closureHandle, str) :
-                  paramlist = lookup(closureHandle, "params")
-                  cmd = lookup(closureHandle, "body")
-                  parentns = lookup(closureHandle, "link")
-            
-            paramsvals = []
+                  paramlist = (closureHandle, "params")
+                  cmd = (closureHandle, "body")
+                  parentns = (closureHandle, "link")
+                  paramsvals = []
             for etree in c[2] :
                   val = interpretETREE(etree)
                   paramsvals.append(val)
